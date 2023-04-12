@@ -16,4 +16,4 @@
 
 生成名字为'output.docxs'的文件:
 
-![image-20230412181352173](.\README.assets\image-20230412181352173.png)
+![image-20230412181352173](./README.assets/image-20230412181352173.png)
