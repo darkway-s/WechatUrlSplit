@@ -3,6 +3,7 @@ from docx import Document
 from docx.shared import Pt
 def convert_to_docx(text_nodes, format_levels, outputfile):
     doc = Document()
+    current_level = None
     for node in text_nodes:
         paragraph = doc.add_paragraph()
 
@@ -13,10 +14,18 @@ def convert_to_docx(text_nodes, format_levels, outputfile):
             level = format_levels[slot_name]
             font_size = 12 + (level * 8)
         else:
+            level = 0
             font_size = 6
-            
+
+        # Step 7: Check if the current level is different from the previous level.
+        if current_level is not None and current_level < level:
+            doc.add_paragraph("----我是一条分割线----")
+
         run = paragraph.add_run(str(node))
         run.font.size = Pt(font_size)
+        
+        # Step 8: Update the current level.
+        current_level = level
         
     doc.save(outputfile)
 
@@ -48,19 +57,16 @@ def StyleSlot(html_content, outputfile, L=5):
 
     # Step 4: Assign a level to each format slot based on the total length of the text in it.
     sorted_slots = sorted(slot_lengths.items(), key=lambda x: x[1], reverse=True)
-    # 输出sorted_slots长度
-    print('types of fonts', len(sorted_slots))
 
-    # 只取长度最高的L种
-    # L = 5
+    # Step 5: Only keep the L most common format slots.
     sorted_slots = sorted_slots[:L]
 
     format_levels = {slot[0]: i+1 for i, slot in enumerate(sorted_slots)}
 
-
-    # Step 5: Use python-docx to convert the HTML to a Word document.
+    # Step 6: Use python-docx to convert the HTML to a Word document.
     convert_to_docx(text_nodes, format_levels, outputfile)
     return 'Done!'
+
 
 if '__main__' == __name__:
     inputfile = 'test.html'
